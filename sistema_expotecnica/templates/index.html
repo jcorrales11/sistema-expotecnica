@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-indigo-900 text-white p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-lg">
+        <div>
+            <h1 class="text-2xl font-bold">Panel de Administración General</h1>
+            <p class="text-sm text-indigo-200 mt-1">Control de proyectos, seguimiento de ternas y actas consolidadas.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="/admin/proyectos" class="bg-yellow-400 text-slate-900 text-xs font-bold px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition">+ Proyecto</a>
+            <a href="/admin/jueces" class="bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-600 transition">+ Juez</a>
+        </div>
+    </div>
+
+    <!-- Directorio Rápido de QR para Jueces -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="font-bold text-slate-900 mb-1 text-base flex items-center">
+            <i class="fa-solid fa-qrcode text-indigo-600 mr-2"></i> Códigos QR de Acceso para Jueces
+        </h2>
+        <p class="text-xs text-slate-500 mb-4">Muestre o entregue este código a cada juez. Al escanearlo con el celular, se abrirán exclusivamente sus proyectos asignados:</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {% for j in jueces %}
+            <div class="border rounded-xl p-4 text-center bg-slate-50 hover:bg-white hover:border-indigo-400 transition space-y-2">
+                <p class="font-bold text-xs text-slate-800 truncate" title="{{ j.nombre }}">{{ j.nombre }}</p>
+                <img src="/qr/juez/{{ j.id }}.png" alt="QR {{ j.nombre }}" class="w-28 h-28 mx-auto border bg-white p-1 rounded-lg shadow-sm">
+                <a href="/qr/juez/{{ j.id }}.png" target="_blank" download="QR_{{ j.nombre }}.png" class="inline-block text-[11px] text-indigo-700 hover:underline font-semibold">
+                    <i class="fa-solid fa-download mr-1"></i> Descargar QR
+                </a>
+            </div>
+            {% else %}
+            <p class="text-xs text-slate-400 col-span-4">No hay jueces registrados aún.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Tabla General de Proyectos -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+            <h2 class="font-bold text-slate-800 text-sm">Estado de Calificación de Proyectos</h2>
+            <span class="text-xs bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full font-bold">{{ proyectos|length }} Proyectos</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-100 border-b text-xs text-slate-600 uppercase font-semibold">
+                    <tr>
+                        <th class="p-3">Código / Proyecto</th>
+                        <th class="p-3">Categoría</th>
+                        <th class="p-3">Estudiantes (3)</th>
+                        <th class="p-3 text-center">Jueces</th>
+                        <th class="p-3 text-center">Promedio</th>
+                        <th class="p-3 text-right">Acta Oficial</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y text-xs">
+                    {% for p in proyectos %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3"><strong class="font-mono text-indigo-700">{{ p.codigo }}</strong><br>{{ p.nombre }}</td>
+                        <td class="p-3"><span class="bg-slate-100 px-2 py-0.5 rounded font-semibold text-slate-700">{{ p.especialidad }}</span></td>
+                        <td class="p-3">
+                            {% for est in p.estudiantes if est %}{{ est }}<br>{% endfor %}
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 rounded font-bold {% if p.total_evaluados == 3 %}bg-green-100 text-green-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                {{ p.total_evaluados }}/3
+                            </span>
+                        </td>
+                        <td class="p-3 text-center font-bold text-indigo-700 text-sm">{{ p.promedio }}{% if p.promedio != 'Sin notas' %}%{% endif %}</td>
+                        <td class="p-3 text-right">
+                            <a href="/proyecto/{{ p.id }}/acta-consolidada-pdf" target="_blank" class="text-indigo-700 font-bold hover:underline bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200">
+                                Imprimir Acta PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="p-6 text-center text-slate-400">No hay proyectos registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Evaluador - {{ juez.nombre }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 min-h-screen p-4 sm:p-6 pb-12">
+
+    <div class="max-w-2xl mx-auto space-y-5">
+        <!-- Encabezado del Juez -->
+        <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md">
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-indigo-800 px-2 py-0.5 rounded text-indigo-200">Panel Oficial de Evaluación</span>
+            <h1 class="text-xl font-bold mt-1">{{ juez.nombre }}</h1>
+            <p class="text-xs text-indigo-200">Cédula: {{ juez.cedula }}</p>
+        </div>
+
+        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wide">Mis Proyectos Asignados ({{ asignaciones|length }})</h2>
+
+        <!-- Lista de Proyectos para Evaluar -->
+        <div class="space-y-4">
+            {% for a in asignaciones %}
+            <div class="bg-white p-5 rounded-2xl border shadow-sm space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="font-mono font-bold text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded border border-indigo-200">{{ a.codigo }}</span>
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-full {% if a.estado == 'EVALUADO' %}bg-green-100 text-green-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                        {{ a.estado }}
+                    </span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">{{ a.nombre }}</h3>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">
+                        Estudiantes: {{ a.estudiante_1 }}{% if a.estudiante_2 %}, {{ a.estudiante_2 }}{% endif %}{% if a.estudiante_3 %}, {{ a.estudiante_3 }}{% endif %}
+                    </p>
+                </div>
+
+                <div class="pt-3 border-t flex justify-between items-center">
+                    {% if a.estado == 'EVALUADO' %}
+                    <div>
+                        <span class="text-[10px] text-slate-400 block">Calificación enviada:</span>
+                        <span class="text-base font-extrabold text-green-700">{{ a.nota_final }}%</span>
+                    </div>
+                    <a href="/evaluacion/{{ a.evaluacion_id }}/docx" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl transition">
+                        <i class="fa-solid fa-file-word text-blue-600 mr-1"></i> Descargar Word
+                    </a>
+                    {% else %}
+                    <span class="text-xs text-amber-600 font-medium"><i class="fa-solid fa-clock mr-1"></i> Pendiente</span>
+                    <a href="/evaluar/{{ a.asignacion_id }}" class="bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow transition">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> Evaluar Ahora
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-white p-8 rounded-2xl border text-center text-slate-400 text-xs">
+                No tiene proyectos asignados actualmente.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

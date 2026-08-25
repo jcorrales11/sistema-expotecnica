@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Proyectos - ExpoTécnica{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Gestión de Proyectos y Terna de Jueces</h1>
+        <p class="text-slate-500 text-sm">Registre proyectos STEAM con hasta 3 estudiantes y asigne obligatoriamente los 3 jueces evaluadores.</p>
+    </div>
+
+    <!-- Alertas en pantalla -->
+    {% if error %}
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg text-sm text-red-800 flex items-center justify-between">
+        <div><i class="fa-solid fa-circle-exclamation mr-2"></i> {{ error }}</div>
+        <a href="/admin/proyectos" class="text-xs font-bold underline">Cerrar</a>
+    </div>
+    {% endif %}
+
+    <!-- Formulario de Registro -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center border-b pb-2">
+            <i class="fa-solid fa-folder-plus text-indigo-600 mr-2"></i> Registrar Nuevo Proyecto STEAM
+        </h2>
+
+        {% if jueces|length < 3 %}
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 text-xs flex items-center justify-between">
+            <div>
+                <i class="fa-solid fa-triangle-exclamation mr-1 text-sm font-bold"></i>
+                Tiene registrados <strong>{{ jueces|length }} jueces</strong>. Se requieren al menos <strong>3 jueces</strong> en el sistema antes de poder crear proyectos.
+            </div>
+            <a href="/admin/jueces" class="bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-amber-700">Registrar Jueces</a>
+        </div>
+        {% else %}
+        <form action="/admin/proyectos/crear" method="POST" class="space-y-4">
+            <input type="hidden" name="especialidad" value="STEAM">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Código del Proyecto *</label>
+                    <input type="text" name="codigo" required placeholder="Ej. EXP-001" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Proyecto *</label>
+                    <input type="text" name="nombre" required placeholder="Nombre descriptivo del proyecto" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+
+            <!-- Integrantes (Hasta 3 Estudiantes) -->
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <p class="text-xs font-bold text-slate-700 mb-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-user-group text-indigo-600 mr-1"></i> Integrantes del Equipo (Hasta 3 Estudiantes)
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-600 mb-1">Estudiante 1 (Obligatorio) *</label>
+                        <input type="text" name="estudiante_1" required placeholder="Nombre Completo" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600 mb-1">Estudiante 2 (Opcional)</label>
+                        <input type="text" name="estudiante_2" placeholder="Nombre Completo" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600 mb-1">Estudiante 3 (Opcional)</label>
+                        <input type="text" name="estudiante_3" placeholder="Nombre Completo" class="w-full px-3 py-1.5 border rounded-lg text-sm bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terna Obligatoria de 3 Jueces -->
+            <div class="bg-indigo-50/50 p-4 rounded-lg border border-indigo-100">
+                <p class="text-xs font-bold text-indigo-900 mb-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-gavel text-indigo-600 mr-1"></i> Terna Obligatoria de Evaluadores (Seleccione 3 Jueces Distintos) *
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-700 mb-1">Juez Evaluador 1 *</label>
+                        <select name="juez_1" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                            <option value="">-- Seleccionar Juez 1 --</option>
+                            {% for j in jueces %}
+                            <option value="{{ j.id }}">{{ j.nombre }} ({{ j.cedula }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-700 mb-1">Juez Evaluador 2 *</label>
+                        <select name="juez_2" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                            <option value="">-- Seleccionar Juez 2 --</option>
+                            {% for j in jueces %}
+                            <option value="{{ j.id }}">{{ j.nombre }} ({{ j.cedula }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-700 mb-1">Juez Evaluador 3 *</label>
+                        <select name="juez_3" required class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                            <option value="">-- Seleccionar Juez 3 --</option>
+                            {% for j in jueces %}
+                            <option value="{{ j.id }}">{{ j.nombre }} ({{ j.cedula }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-6 py-2.5 rounded-lg text-sm shadow transition">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Guardar Proyecto y Asignar Terna
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- Lista de Proyectos -->
+    <div class="space-y-4">
+        <h2 class="text-base font-bold text-slate-800">Proyectos Registrados ({{ proyectos_data|length }})</h2>
+
+        {% for item in proyectos_data %}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                <div>
+                    <span class="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200">{{ item.proyecto.codigo }}</span>
+                    <h3 class="text-base font-bold text-slate-900 inline ml-2">{{ item.proyecto.nombre }}</h3>
+                    <span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold ml-2">STEAM</span>
+                </div>
+                <div>
+                    <form action="/admin/proyectos/eliminar" method="POST" class="inline" onsubmit="return confirm('¿Seguro que desea eliminar este proyecto y todas sus evaluaciones?');">
+                        <input type="hidden" name="proyecto_id" value="{{ item.proyecto.id }}">
+                        <button type="submit" class="text-xs bg-red-50 text-red-700 hover:bg-red-100 font-semibold px-3 py-1.5 rounded-lg border border-red-200 transition">
+                            <i class="fa-solid fa-trash mr-1"></i> Eliminar Proyecto
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-xs text-slate-600 flex flex-wrap gap-4 items-center">
+                <span class="font-bold text-slate-700"><i class="fa-solid fa-users text-indigo-600 mr-1"></i> Estudiantes:</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-700">1. {{ item.proyecto.estudiante_1 }}</span>
+                {% if item.proyecto.estudiante_2 %}
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-700">2. {{ item.proyecto.estudiante_2 }}</span>
+                {% endif %}
+                {% if item.proyecto.estudiante_3 %}
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-700">3. {{ item.proyecto.estudiante_3 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Terna y Reasignación -->
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <p class="text-xs font-bold text-slate-700 mb-2">Terna de Evaluadores Asignada:</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {% for asig in item.asignaciones %}
+                    <div class="bg-white p-3 rounded border border-slate-200 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800 truncate">{{ asig.juez_nombre }}</span>
+                            <span class="{% if asig.estado == 'EVALUADO' %}text-green-700 font-bold{% else %}text-amber-600 font-semibold{% endif %}">
+                                • {{ asig.estado }}
+                            </span>
+                        </div>
+
+                        {% if asig.estado == 'PENDIENTE' %}
+                        <form action="/admin/asignacion/cambiar-juez" method="POST" class="pt-2 border-t flex gap-1">
+                            <input type="hidden" name="asignacion_id" value="{{ asig.asignacion_id }}">
+                            <select name="nuevo_juez_id" required class="w-full border rounded px-1.5 py-1 text-[11px] bg-slate-50">
+                                <option value="">-- Cambiar juez por --</option>
+                                {% for j in jueces %}
+                                    {% if j.id != asig.juez_id %}
+                                    <option value="{{ j.id }}">{{ j.nombre }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-1 rounded text-[11px]">
+                                Cambiar
+                            </button>
+                        </form>
+                        {% else %}
+                        <p class="text-[11px] text-green-700 font-medium pt-1 border-t">Evaluación completada</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-white p-8 rounded-xl border text-center text-slate-400 text-xs">
+            No hay proyectos registrados aún.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

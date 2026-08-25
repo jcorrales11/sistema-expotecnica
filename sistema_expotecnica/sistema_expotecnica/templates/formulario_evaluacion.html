@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block title %}Evaluación Desafío STEAM - {{ asig.proyecto_nombre }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 pb-12">
+
+    <!-- Encabezado Institucional y Datos del Proyecto -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-4 gap-2">
+            <div>
+                <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded border border-indigo-200">
+                    Desafío STEAM — Curso Lectivo
+                </span>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 mt-2">{{ asig.proyecto_nombre }}</h1>
+                <p class="text-xs sm:text-sm text-slate-600">Especialidad: <strong>{{ asig.especialidad }}</strong> (Sección: <strong>{{ asig.seccion }}</strong>)</p>
+            </div>
+            <div class="text-right">
+                <span class="font-mono text-sm font-extrabold bg-slate-100 text-slate-800 px-3 py-1.5 rounded border">
+                    {{ asig.codigo }}
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div>
+                <p class="font-bold text-slate-800 mb-1"><i class="fa-solid fa-users text-indigo-600 mr-1"></i> Equipo de Estudiantes:</p>
+                <p class="font-medium">1. {{ asig.estudiante_1 }}</p>
+                {% if asig.estudiante_2 %}<p class="font-medium">2. {{ asig.estudiante_2 }}</p>{% endif %}
+                {% if asig.estudiante_3 %}<p class="font-medium">3. {{ asig.estudiante_3 }}</p>{% endif %}
+            </div>
+            <div>
+                <p class="font-bold text-slate-800 mb-1"><i class="fa-solid fa-user-tie text-indigo-600 mr-1"></i> Juez Evaluador:</p>
+                <p class="font-semibold text-slate-900">{{ asig.juez_nombre }}</p>
+                <p class="text-slate-500">Cédula: {{ asig.juez_cedula }}</p>
+            </div>
+        </div>
+
+        <!-- Escala de calificación explicada -->
+        <div class="mt-4 bg-indigo-50/60 p-3 rounded-lg border border-indigo-100 text-xs text-indigo-950 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div><strong class="text-green-700">3 pts:</strong> Logrado</div>
+            <div><strong class="text-blue-700">2 pts:</strong> Parcialmente logrado</div>
+            <div><strong class="text-amber-700">1 pt:</strong> No logrado</div>
+            <div><strong class="text-slate-600">0 pts:</strong> Ausente</div>
+        </div>
+    </div>
+
+    <!-- Formulario con los 29 Indicadores Oficiales -->
+    <form action="/evaluar/{{ asig.asignacion_id }}/guardar" method="POST" class="space-y-6">
+
+        <!-- ================= SECCIÓN I ================= -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-indigo-900 border-b pb-2 flex items-center">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs mr-2 font-bold">I</span>
+                Identificación y Formulación del Problema (5 indicadores)
+            </h2>
+
+            {% set sec_1 = [
+                ('i_a', 'a. Define el problema de forma precisa.'),
+                ('i_b', 'b. Plantea alternativas de solución que contemplen conceptos teóricos prácticos atinentes al problema.'),
+                ('i_c', 'c. Propone objetivos vinculados con la búsqueda de soluciones al problema planteado.'),
+                ('i_d', 'd. Evidencia el impacto del proyecto a nivel social, científico o tecnológico, tanto a corto como largo plazo.'),
+                ('i_e', 'e. Demuestra capacidad para expresar ideas con seguridad y defender el proyecto planteado.')
+            ] %}
+
+            {% for field, label in sec_1 %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto, text in [(3, 'Logrado (3)'), (2, 'Parcial (2)'), (1, 'No logrado (1)'), (0, 'Ausente (0)')] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ================= SECCIÓN II ================= -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-indigo-900 border-b pb-2 flex items-center">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs mr-2 font-bold">II</span>
+                Demuestra Capacidad para Expresar Ideas y Defender el Proyecto (6 indicadores)
+            </h2>
+
+            {% set sec_2 = [
+                ('ii_a', 'a. Demuestra en su elaboración una línea de investigación y desarrollo coherente y clara.'),
+                ('ii_b', 'b. Argumenta, desde la implementación del proyecto, el análisis e interpretación de los datos recopilados.'),
+                ('ii_c', 'c. Evidencia la gestión de recursos y búsqueda de apoyo para la elaboración del proyecto.'),
+                ('ii_d', 'd. Demuestra originalidad y autoría propia del proyecto expuesto.'),
+                ('ii_e', 'e. Aplica la normativa vigente en el contexto del proyecto.'),
+                ('ii_f', 'f. Se evidencia la factibilidad e implementación comercial o industrial del proyecto, a futuro.')
+            ] %}
+
+            {% for field, label in sec_2 %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto, text in [(3, 'Logrado (3)'), (2, 'Parcial (2)'), (1, 'No logrado (1)'), (0, 'Ausente (0)')] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ================= SECCIÓN III ================= -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-indigo-900 border-b pb-2 flex items-center">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs mr-2 font-bold">III</span>
+                Prototipo (8 indicadores)
+            </h2>
+
+            {% set sec_3 = [
+                ('iii_a', 'a. Presenta una línea de trabajo de investigación y desarrollo coherente y clara.'),
+                ('iii_b', 'b. Da respuesta a la necesidad u objetivos planteados.'),
+                ('iii_c', 'c. Evidencia el uso óptimo de los recursos disponibles para su construcción.'),
+                ('iii_d', 'd. Demuestra precisión técnica en la elaboración y funcionamiento del prototipo.'),
+                ('iii_e', 'e. Respeta las normativas de seguridad y otras vigentes en su construcción y desempeño.'),
+                ('iii_f', 'f. Muestra actualidad tecnológica en el campo de trabajo seleccionado.'),
+                ('iii_g', 'g. Evidencia el funcionamiento correcto según la solución planteada en el proyecto.'),
+                ('iii_h', 'h. Demuestra creatividad e innovación en el desarrollo de ideas nuevas o mejoradas al crear el prototipo.')
+            ] %}
+
+            {% for field, label in sec_3 %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto, text in [(3, 'Logrado (3)'), (2, 'Parcial (2)'), (1, 'No logrado (1)'), (0, 'Ausente (0)')] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ================= SECCIÓN IV ================= -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-indigo-900 border-b pb-2 flex items-center">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs mr-2 font-bold">IV</span>
+                Exposición del Proyecto (10 indicadores)
+            </h2>
+
+            {% set sec_4 = [
+                ('iv_a', 'a. Evidencia apropiación y dominio del tema del proyecto.'),
+                ('iv_b', 'b. Demuestra claridad y coherencia en la exposición del proyecto ante el panel de jueces.'),
+                ('iv_c', 'c. Utiliza lenguaje técnico acorde con el nivel académico y el campo de desarrollo del proyecto.'),
+                ('iv_d', 'd. Argumenta de forma sólida y fundamentada su propuesta de proyecto.'),
+                ('iv_e', 'e. Emplea recursos afines con el tema del proyecto (diseños, diagramas, gráficos, esquemas, modelos, equipos).'),
+                ('iv_f', 'f. Describe la metodología utilizada para la implementación, evaluación y perfeccionamiento.'),
+                ('iv_g', 'g. Presenta resultados consistentes con los objetivos y solución al problema planteado.'),
+                ('iv_h', 'h. Brinda conclusiones precisas y objetivas basadas en los resultados obtenidos.'),
+                ('iv_i', 'i. Denota colaboración y comunicación efectiva del estudiante o integrantes del equipo.'),
+                ('iv_j', 'j. Demuestra capacidad de recibir, analizar y aplicar sugerencias para mejorar el proyecto.')
+            ] %}
+
+            {% for field, label in sec_4 %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto, text in [(3, 'Logrado (3)'), (2, 'Parcial (2)'), (1, 'No logrado (1)'), (0, 'Ausente (0)')] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- ================= SECCIÓN V ================= -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-indigo-900 border-b pb-2 flex items-center">
+                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs mr-2 font-bold">V</span>
+                Documentación del Proyecto (Informe Escrito, Bitácora y Cartel)
+            </h2>
+
+            <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mt-2">1. Informe Escrito:</p>
+            {% set sec_5_inf = [
+                ('v_a_inf', 'a. Se evidencia congruencia entre lo expuesto por la persona estudiante o equipo y el informe escrito.'),
+                ('v_b_inf', 'b. Evidencia el uso de lenguaje técnico afín al tema del proyecto.'),
+                ('v_c_inf', 'c. Estipula los procedimientos técnicos utilizados.')
+            ] %}
+            {% for field, label in sec_5_inf %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto in [3, 2, 1, 0] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mt-4">2. Bitácora (Detalle cronológico):</p>
+            {% set sec_5_bit = [
+                ('v_a_bit', 'a. Procesos de Investigación.'),
+                ('v_b_bit', 'b. Procesos de Implementación.'),
+                ('v_c_bit', 'c. Procesos de Experimentación.')
+            ] %}
+            {% for field, label in sec_5_bit %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto in [3, 2, 1, 0] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mt-4">3. Cartel de Presentación o Recursos Audiovisuales:</p>
+            {% set sec_5_car = [
+                ('v_a_car', 'a. Contiene información relevante para la exposición del proyecto.'),
+                ('v_b_car', 'b. Utiliza el cartel como recurso y apoyo para el desarrollo de la exposición.')
+            ] %}
+            {% for field, label in sec_5_car %}
+            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p class="text-xs font-semibold text-slate-800 sm:w-2/3 leading-relaxed">{{ label }}</p>
+                <div class="flex gap-2 sm:gap-3 justify-end">
+                    {% for pto in [3, 2, 1, 0] %}
+                    <label class="flex flex-col items-center cursor-pointer bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-indigo-500 shadow-sm text-center">
+                        <input type="radio" name="{{ field }}" value="{{ pto }}" required {% if pto == 3 %}checked{% endif %} class="w-4 h-4 text-indigo-600">
+                        <span class="text-[10px] font-bold text-slate-700 mt-1">{{ pto }} pts</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Observaciones y Recomendaciones Finales -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <h2 class="text-base font-bold text-slate-800 border-b pb-2">Recomendaciones Finales del Juez</h2>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Recomendaciones para la mejora del proyecto:</label>
+                <textarea name="recomendaciones" rows="3" placeholder="Escriba las recomendaciones técnicas u observaciones constructivas para el equipo..." class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Botón de Envío -->
+        <div class="flex items-center justify-between pt-2">
+            <a href="/juez/panel?juez_id={{ asig.juez_id }}" class="text-xs font-semibold text-slate-600 hover:text-slate-800">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Cancelar / Volver
+            </a>
+            <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-8 py-3 rounded-xl text-sm shadow-lg transition flex items-center">
+                <i class="fa-solid fa-check-circle mr-2"></i> Finalizar y Guardar Evaluación
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

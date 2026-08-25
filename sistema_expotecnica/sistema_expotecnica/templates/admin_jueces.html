@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Gestión de Jueces - ExpoTécnica{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Directorio de Jueces Evaluadores</h1>
+        <p class="text-slate-500 text-sm">Registre, consulte y gestione los jueces disponibles para calificar proyectos.</p>
+    </div>
+
+    <!-- Alertas -->
+    {% if error %}
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg text-sm text-red-800 flex items-center justify-between">
+        <div><i class="fa-solid fa-circle-exclamation mr-2"></i> {{ error }}</div>
+        <a href="/admin/jueces" class="text-xs font-bold underline">Cerrar</a>
+    </div>
+    {% endif %}
+
+    <!-- Formulario de Registro -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center border-b pb-2">
+            <i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i> Registrar Nuevo Juez
+        </h2>
+        <form action="/admin/jueces/crear" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Cédula / Identificación *</label>
+                <input type="text" name="cedula" required placeholder="Ej. 1-1234-0567" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
+                <input type="text" name="nombre" required placeholder="Ej. Ing. Carlos Mendoza Rivera" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Área / Especialidad</label>
+                <input type="text" name="especialidad" placeholder="Ej. Informática / Electrónica" value="Evaluador STEAM" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico</label>
+                <input type="email" name="email" placeholder="correo@mep.go.cr" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
+                <input type="text" name="telefono" placeholder="8888-0000" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div class="md:col-span-3 flex justify-end pt-2">
+                <button type="submit" class="bg-indigo-700 hover:bg-indigo-800 text-white font-bold px-6 py-2 rounded-lg text-sm shadow transition">
+                    <i class="fa-solid fa-save mr-1.5"></i> Guardar Juez
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Jueces Guardados -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h2 class="font-bold text-slate-800 text-base">Jueces Registrados ({{ jueces|length }})</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-semibold border-b">
+                    <tr>
+                        <th class="py-3 px-4">Cédula</th>
+                        <th class="py-3 px-4">Nombre Completo</th>
+                        <th class="py-3 px-4">Especialidad</th>
+                        <th class="py-3 px-4">Contacto</th>
+                        <th class="py-3 px-4 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for j in jueces %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-slate-700">{{ j.cedula }}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900">{{ j.nombre }}</td>
+                        <td class="py-3 px-4 text-slate-600 text-xs">{{ j.especialidad }}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">
+                            <div>{{ j.email or 'Sin correo' }}</div>
+                            <div>{{ j.telefono or 'Sin teléfono' }}</div>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-2">
+                            <a href="/juez/panel?juez_id={{ j.id }}" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold px-2.5 py-1 rounded border border-indigo-200">
+                                Panel
+                            </a>
+                            <form action="/admin/jueces/eliminar" method="POST" class="inline" onsubmit="return confirm('¿Seguro que desea eliminar a este juez?');">
+                                <input type="hidden" name="juez_id" value="{{ j.id }}">
+                                <button type="submit" class="text-xs bg-red-50 text-red-700 hover:bg-red-100 font-semibold px-2.5 py-1 rounded border border-red-200">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-slate-400 text-xs">
+                            No hay jueces registrados todavía. Registre al menos 3 jueces para poder agregar proyectos.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

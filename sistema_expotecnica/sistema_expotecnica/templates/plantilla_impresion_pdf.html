@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluación Desafío STEAM - ExpoTécnica</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 8mm 10mm 8mm 10mm;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 7pt;
+            color: #000;
+            line-height: 1.15;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Encabezado con Logos */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+        .header-table td {
+            border: none;
+            padding: 0;
+            vertical-align: middle;
+        }
+        .mep-badge {
+            font-family: Arial, sans-serif;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #001f3f;
+            line-height: 1.1;
+        }
+        .mep-sub {
+            font-size: 6.5pt;
+            color: #444;
+            font-weight: normal;
+        }
+        .expotec-title {
+            text-align: right;
+            font-family: Arial, sans-serif;
+            font-size: 13pt;
+            font-weight: 900;
+            color: #e65100;
+            letter-spacing: -0.5px;
+        }
+        .expotec-sub {
+            font-size: 6.5pt;
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+        }
+
+        .title-box {
+            text-align: center;
+            font-weight: bold;
+            font-size: 8.5pt;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        /* Tabla de Información General */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+        }
+        .info-table td {
+            border: 1px solid #000;
+            padding: 2.5px 4px;
+            font-size: 6.8pt;
+        }
+        .label {
+            font-weight: bold;
+            background-color: #f2f2f2;
+            width: 22%;
+        }
+
+        .instructions {
+            font-size: 6pt;
+            text-align: justify;
+            margin-bottom: 4px;
+            line-height: 1.15;
+        }
+
+        /* Matriz de Evaluación */
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 4px;
+        }
+        .rubric-table th, .rubric-table td {
+            border: 1px solid #000;
+            padding: 2px 2px;
+            font-size: 6.2pt;
+        }
+        .rubric-table th {
+            background-color: #e0e0e0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 5.8pt;
+            line-height: 1.1;
+        }
+
+        .col-indicador { width: 50%; text-align: left; }
+        .col-logrado { width: 9%; text-align: center; }
+        .col-parcial { width: 9%; text-align: center; }
+        .col-nolab { width: 9%; text-align: center; }
+        .col-ausente { width: 8%; text-align: center; }
+        .col-obs { width: 15%; text-align: left; }
+
+        .center { text-align: center; font-weight: bold; font-size: 7.5pt; }
+        .section-header {
+            background-color: #d0d0d0;
+            font-weight: bold;
+            font-size: 6.8pt;
+            padding: 3px 2px;
+        }
+        .subtotal-label {
+            text-align: right;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            padding-right: 6px;
+        }
+        .subtotal-val {
+            text-align: center;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            font-size: 7pt;
+        }
+
+        /* Resumen Final */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+        .summary-table td {
+            border: 1px solid #000;
+            padding: 2.5px 5px;
+            font-size: 6.8pt;
+        }
+
+        .recom-box {
+            border: 1px solid #000;
+            padding: 4px;
+            font-size: 6.5pt;
+            min-height: 22px;
+            margin-bottom: 5px;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+        .footer-table td {
+            border: none;
+            padding: 1px;
+            font-size: 6.8pt;
+        }
+        .sign-line {
+            border-top: 1px solid #000;
+            padding-top: 3px;
+            text-align: center;
+            font-size: 6.5pt;
+            font-weight: bold;
+            width: 70%;
+            margin: 18px auto 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado con Membrete y Logos Oficiales -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 58%;">
+                <div class="mep-badge">MINISTERIO DE EDUCACIÓN PÚBLICA</div>
+                <div class="mep-sub">GOBIERNO DE COSTA RICA</div>
+                <div class="mep-sub" style="font-weight: bold; color: #222; margin-top: 1px;">
+                    Dirección de Educación Técnica y Capacidades Emprendedoras
+                </div>
+            </td>
+            <td style="width: 42%; text-align: right;">
+                <div class="expotec-sub">Formulario Oficial: ExpoTEC-7</div>
+                <div class="expotec-title"><span style="color:#0288d1;">expo</span><span style="color:#f57c00;">TÉCNICA</span></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="title-box">
+        Evaluación de la Exposición del Proyecto (Desafío STEAM) — Curso lectivo 2026
+    </div>
+
+    <!-- Metadatos del Proyecto -->
+    <table class="info-table">
+        <tr>
+            <td class="label">Centro educativo:</td>
+            <td colspan="3">Colegio Técnico Profesional</td>
+        </tr>
+        <tr>
+            <td class="label">Nombre de las personas estudiantes:</td>
+            <td colspan="3">{{ estudiantes | join('  |  ') }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nombre del Proyecto:</td>
+            <td colspan="3" style="font-weight: bold;">{{ d.proyecto_nombre }}</td>
+        </tr>
+        <tr>
+            <td class="label" style="width: 18%;">Categoría:</td>
+            <td style="width: 32%;">STEAM</td>
+            <td class="label" style="width: 18%;">Eje Temático:</td>
+            <td style="width: 32%;">{{ d.especialidad }} ({{ d.seccion }})</td>
+        </tr>
+    </table>
+
+    <div class="instructions">
+        <strong>Instrucciones:</strong> seleccione el nivel de la escala según su criterio:
+        <strong>Logrado (3 ptos):</strong> Demuestra a cabalidad el dominio total. |
+        <strong>Parcialmente logrado (2 ptos):</strong> Demuestra dominio parcial. |
+        <strong>No logrado (1 pto):</strong> Carencia en el dominio. |
+        <strong>Ausente (0):</strong> No se evidencia.
+    </div>
+
+    <!-- Tabla Rúbrica con Anchos Fijos -->
+    <table class="rubric-table">
+        <thead>
+            <tr>
+                <th class="col-indicador">Indicadores por Evaluar</th>
+                <th class="col-logrado">Logrado<br>(3 ptos)</th>
+                <th class="col-parcial">Parcialmente<br>logrado (2 ptos)</th>
+                <th class="col-nolab">No logrado<br>(1 pto)</th>
+                <th class="col-ausente">Ausente<br>(0)</th>
+                <th class="col-obs">Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- SECCIÓN I -->
+            <tr class="section-header"><td colspan="6">I. Identificación y formulación del problema.</td></tr>
+            <tr>
+                <td>a. Define el problema de forma precisa.</td>
+                <td class="center">{% if d.i_a == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.i_a == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.i_a == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.i_a == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Plantea alternativas de solución que contemplen conceptos teóricos prácticos atinentes al problema.</td>
+                <td class="center">{% if d.i_b == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.i_b == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.i_b == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.i_b == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Propone objetivos vinculados con la búsqueda de soluciones al problema planteado.</td>
+                <td class="center">{% if d.i_c == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.i_c == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.i_c == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.i_c == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>d. Evidencia el impacto del proyecto a nivel social, científico o tecnológico, tanto a corto como largo plazo.</td>
+                <td class="center">{% if d.i_d == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.i_d == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.i_d == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.i_d == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>e. Demuestra capacidad para expresar ideas con seguridad y defender el proyecto planteado.</td>
+                <td class="center">{% if d.i_e == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.i_e == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.i_e == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.i_e == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="subtotal-label">Subtotal I:</td>
+                <td class="subtotal-val">{{ d.i_a + d.i_b + d.i_c + d.i_d + d.i_e }} pts</td>
+            </tr>
+
+            <!-- SECCIÓN II -->
+            <tr class="section-header"><td colspan="6">II. Demuestra capacidad para expresar ideas con seguridad y defender el proyecto planteado.</td></tr>
+            <tr>
+                <td>a. Demuestra en su elaboración una línea de investigación y desarrollo coherente y clara.</td>
+                <td class="center">{% if d.ii_a == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_a == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_a == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_a == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Argumenta, desde la implementación del proyecto, el análisis e interpretación de los datos recopilados.</td>
+                <td class="center">{% if d.ii_b == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_b == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_b == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_b == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Evidencia la gestión de recursos y búsqueda de apoyo para la elaboración del proyecto.</td>
+                <td class="center">{% if d.ii_c == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_c == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_c == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_c == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>d. Demuestra originalidad y autoría propia del proyecto expuesto.</td>
+                <td class="center">{% if d.ii_d == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_d == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_d == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_d == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>e. Aplica la normativa vigente en el contexto del proyecto.</td>
+                <td class="center">{% if d.ii_e == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_e == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_e == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_e == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>f. Se evidencia la factibilidad e implementación comercial o industrial del proyecto, a futuro.</td>
+                <td class="center">{% if d.ii_f == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_f == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_f == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.ii_f == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="subtotal-label">Subtotal II:</td>
+                <td class="subtotal-val">{{ d.ii_a + d.ii_b + d.ii_c + d.ii_d + d.ii_e + d.ii_f }} pts</td>
+            </tr>
+
+            <!-- SECCIÓN III -->
+            <tr class="section-header"><td colspan="6">III. Prototipo</td></tr>
+            <tr>
+                <td>a. Presenta una línea de trabajo de investigación y desarrollo coherente y clara.</td>
+                <td class="center">{% if d.iii_a == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_a == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_a == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_a == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Da respuesta a la necesidad u objetivos planteados.</td>
+                <td class="center">{% if d.iii_b == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_b == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_b == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_b == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Evidencia el uso óptimo de los recursos disponibles para su construcción.</td>
+                <td class="center">{% if d.iii_c == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_c == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_c == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_c == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>d. Demuestra precisión técnica en la elaboración y funcionamiento del prototipo.</td>
+                <td class="center">{% if d.iii_d == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_d == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_d == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_d == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>e. Respeta las normativas de seguridad y otras vigentes en su construcción y desempeño.</td>
+                <td class="center">{% if d.iii_e == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_e == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_e == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_e == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>f. Muestra actualidad tecnológica en el campo de trabajo seleccionado.</td>
+                <td class="center">{% if d.iii_f == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_f == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_f == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_f == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>g. Evidencia el funcionamiento correcto según la solución planteada en el proyecto.</td>
+                <td class="center">{% if d.iii_g == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_g == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_g == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_g == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>h. Demuestra creatividad e innovación en el desarrollo de ideas nuevas o mejoradas.</td>
+                <td class="center">{% if d.iii_h == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_h == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_h == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iii_h == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="subtotal-label">Subtotal III:</td>
+                <td class="subtotal-val">{{ d.iii_a + d.iii_b + d.iii_c + d.iii_d + d.iii_e + d.iii_f + d.iii_g + d.iii_h }} pts</td>
+            </tr>
+
+            <!-- SECCIÓN IV -->
+            <tr class="section-header"><td colspan="6">IV. Exposición del proyecto.</td></tr>
+            <tr>
+                <td>a. Evidencia apropiación y dominio del tema del proyecto.</td>
+                <td class="center">{% if d.iv_a == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_a == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_a == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_a == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Demuestra claridad y coherencia en la exposición del proyecto ante el panel de jueces.</td>
+                <td class="center">{% if d.iv_b == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_b == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_b == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_b == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Utiliza lenguaje técnico acorde con el nivel académico y el campo de desarrollo.</td>
+                <td class="center">{% if d.iv_c == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_c == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_c == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_c == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>d. Argumenta de forma sólida y fundamentada su propuesta de proyecto.</td>
+                <td class="center">{% if d.iv_d == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_d == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_d == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_d == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>e. Emplea recursos afines con el tema (diseños, esquemas, modelos, programas, equipos).</td>
+                <td class="center">{% if d.iv_e == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_e == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_e == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_e == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>f. Describe la metodología utilizada para la implementación, evaluación y perfeccionamiento.</td>
+                <td class="center">{% if d.iv_f == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_f == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_f == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_f == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>g. Presenta resultados consistentes con los objetivos y solución al problema planteado.</td>
+                <td class="center">{% if d.iv_g == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_g == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_g == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_g == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>h. Brinda conclusiones precisas y objetivas basadas en los resultados obtenidos.</td>
+                <td class="center">{% if d.iv_h == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_h == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_h == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_h == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>i. Denota colaboración y comunicación efectiva de las personas integrantes del equipo.</td>
+                <td class="center">{% if d.iv_i == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_i == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_i == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_i == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>j. Demuestra capacidad de recibir, analizar y aplicar sugerencias para mejorar el proyecto.</td>
+                <td class="center">{% if d.iv_j == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_j == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_j == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.iv_j == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="subtotal-label">Subtotal IV:</td>
+                <td class="subtotal-val">{{ d.iv_a + d.iv_b + d.iv_c + d.iv_d + d.iv_e + d.iv_f + d.iv_g + d.iv_h + d.iv_i + d.iv_j }} pts</td>
+            </tr>
+
+            <!-- SECCIÓN V -->
+            <tr class="section-header"><td colspan="6">V. Documentación del proyecto.</td></tr>
+            <tr style="background-color: #fafafa; font-weight: bold;"><td colspan="6">Informe escrito:</td></tr>
+            <tr>
+                <td>a. Se evidencia congruencia entre lo expuesto por el equipo y el informe escrito.</td>
+                <td class="center">{% if d.v_a_inf == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_inf == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_inf == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_inf == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Evidencia el uso de lenguaje técnico afín al tema del proyecto.</td>
+                <td class="center">{% if d.v_b_inf == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_inf == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_inf == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_inf == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Estipula los procedimientos técnicos utilizados.</td>
+                <td class="center">{% if d.v_c_inf == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_inf == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_inf == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_inf == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+
+            <tr style="background-color: #fafafa; font-weight: bold;"><td colspan="6">La bitácora detalla en forma cronológica los procesos de:</td></tr>
+            <tr>
+                <td>a. Investigación.</td>
+                <td class="center">{% if d.v_a_bit == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_bit == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_bit == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_bit == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Implementación.</td>
+                <td class="center">{% if d.v_b_bit == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_bit == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_bit == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_bit == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>c. Experimentación.</td>
+                <td class="center">{% if d.v_c_bit == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_bit == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_bit == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_c_bit == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+
+            <tr style="background-color: #fafafa; font-weight: bold;"><td colspan="6">Cartel de presentación o recursos audiovisuales:</td></tr>
+            <tr>
+                <td>a. Contiene información relevante para la exposición del proyecto.</td>
+                <td class="center">{% if d.v_a_car == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_car == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_car == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_a_car == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>b. Utiliza el cartel como recurso y apoyo para el desarrollo de la exposición.</td>
+                <td class="center">{% if d.v_b_car == 3 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_car == 2 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_car == 1 %}X{% endif %}</td>
+                <td class="center">{% if d.v_b_car == 0 %}X{% endif %}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5" class="subtotal-label">Subtotal V:</td>
+                <td class="subtotal-val">{{ d.v_a_inf + d.v_b_inf + d.v_c_inf + d.v_a_bit + d.v_b_bit + d.v_c_bit + d.v_a_car + d.v_b_car }} pts</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Resumen Oficial -->
+    <table class="summary-table">
+        <tr>
+            <td style="width: 50%; font-weight: bold; background-color: #f2f2f2;">Puntaje obtenido:</td>
+            <td style="width: 50%; font-weight: bold; text-align: center; font-size: 8pt;">{{ d.puntaje_total }} / 87</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; background-color: #f2f2f2;">Calificación obtenida (Base 100):</td>
+            <td style="font-weight: bold; text-align: center; font-size: 8pt;">{{ d.nota_final }}</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; background-color: #f2f2f2;">Porcentaje obtenido:</td>
+            <td style="font-weight: bold; text-align: center; font-size: 8pt; color: #001f3f;">{{ d.nota_final }}%</td>
+        </tr>
+    </table>
+
+    <div style="font-weight: bold; font-size: 6.8pt; margin-top: 2px;">Recomendaciones para la mejora del proyecto:</div>
+    <div class="recom-box">
+        {{ d.recomendaciones or 'Sin recomendaciones registradas.' }}
+    </div>
+
+    <!-- Pie Oficial con Datos del Juez y Firma -->
+    <table class="footer-table">
+        <tr>
+            <td style="width: 60%;">
+                Nombre de la persona juez: <strong>{{ d.juez_nombre }}</strong> (Cédula: {{ d.juez_cedula }})
+            </td>
+            <td style="width: 40%; text-align: right;">
+                Fecha y Hora: <strong>{{ d.fecha }}</strong>
+            </td>
+        </tr>
+    </table>
+
+    <div class="sign-line">
+        Firma de la persona juez evaluador
+    </div>
+
+</body>
+</html>

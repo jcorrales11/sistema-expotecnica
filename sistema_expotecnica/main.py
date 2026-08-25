@@ -23,17 +23,16 @@ def startup_event():
     init_db()
 
 
-def obtener_ip_local():
-    """Obtiene la IP del servidor en la red local/Wi-Fi."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(('10.255.255.255', 1))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = '127.0.0.1'
-    finally:
-        s.close()
-    return ip
+def obtener_url_base(request: Request) -> str:
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or ""
+    if "onrender.com" in host or (not host.startswith("127.") and not host.startswith("192.") and not host.startswith(
+            "10.") and not host.startswith("localhost")):
+        scheme = "https"
+    else:
+        scheme = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+    if host:
+        return f"{scheme}://{host}"
+    return "https://sistema-expotecnica.onrender.com"
 
 
 def es_admin_autenticado(admin_session: str = None) -> bool:
@@ -69,7 +68,7 @@ def procesar_login(password: str = Form(...)):
         response.set_cookie(key="admin_session", value="sesion_activa_admin", httponly=True)
         return response
     else:
-        err = urllib.parse.quote("Contraseña de administrador incorrecta.")
+        err = urllib.parse.quote("Contrasena de administrador incorrecta.")
         return RedirectResponse(url=f"/login?error={err}", status_code=303)
 
 
@@ -115,15 +114,16 @@ def index(request: Request, admin_session: str = Cookie(default=None)):
         })
     conn.close()
 
+    base_url = obtener_url_base(request)
     template = templates_env.get_template("index.html")
-    return template.render(proyectos=proyectos_summary, jueces=jueces, ip_servidor=obtener_ip_local())
+    return template.render(proyectos=proyectos_summary, jueces=jueces, base_url=base_url)
 
 
 # ----------------- GENERADOR QR PERSONAL DEL JUEZ -----------------
 @app.get("/qr/juez/{juez_id}.png")
-def generar_qr_juez(juez_id: int):
-    ip_host = obtener_ip_local()
-    url_juez = f"http://{ip_host}:8000/juez/panel?juez_id={juez_id}"
+def generar_qr_juez(request: Request, juez_id: int):
+    base_url = obtener_url_base(request)
+    url_juez = f"{base_url}/juez/panel?juez_id={juez_id}"
 
     qr = qrcode.QRCode(version=1, box_size=8, border=2)
     qr.add_data(url_juez)
@@ -182,7 +182,7 @@ def crear_proyecto(
 
     jueces_seleccionados = {juez_1, juez_2, juez_3}
     if len(jueces_seleccionados) < 3:
-        err = urllib.parse.quote("Los 3 jueces asignados deben ser diferentes.")
+        err = urllib.parse.quote("Los 3 jueces asignados deben ser personas diferentes.")
         return RedirectResponse(url=f"/admin/proyectos?error={err}", status_code=303)
 
     conn = get_db()
@@ -265,7 +265,7 @@ def vista_jueces(error: str = None, admin_session: str = Cookie(default=None)):
     jueces = conn.execute("SELECT * FROM jueces ORDER BY nombre ASC").fetchall()
     conn.close()
     template = templates_env.get_template("admin_jueces.html")
-    return template.render(jueces=jueces, error=error, ip_servidor=obtener_ip_local())
+    return template.render(jueces=jueces, error=error)
 
 
 @app.post("/admin/jueces/crear")
@@ -274,12 +274,8 @@ def crear_juez(
         nombre: str = Form(...),
         email: str = Form(""),
         especialidad: str = Form("STEAM"),
-        telefono: str = Form(""),
-        admin_session: str = Cookie(default=None)
+        telefono: str = Form("")
 ):
-    if not es_admin_autenticado(admin_session):
-        return RedirectResponse(url="/login", status_code=303)
-
     conn = get_db()
     cursor = conn.cursor()
     try:
@@ -311,7 +307,7 @@ def eliminar_juez(juez_id: int = Form(...), admin_session: str = Cookie(default=
     return RedirectResponse(url="/admin/jueces", status_code=303)
 
 
-# ----------------- PORTAL Y EVALUACIÓN DEL JUEZ (ACCESO PÚBLICO POR QR) -----------------
+# ----------------- PORTAL Y EVALUACION DEL JUEZ (ACCESO PUBLICO POR QR) -----------------
 @app.get("/juez/panel", response_class=HTMLResponse)
 def juez_panel(juez_id: int):
     conn = get_db()
@@ -352,6 +348,9 @@ def formulario_evaluar(asignacion_id: int):
     ''', (asignacion_id,)).fetchone()
     conn.close()
 
+    if not asig:
+        return HTMLResponse("<h2>Asignacion no encontrada.</h2>", status_code=404)
+
     template = templates_env.get_template("formulario_evaluacion.html")
     return template.render(asig=asig)
 
@@ -378,7 +377,7 @@ async def guardar_evaluacion(request: Request, asignacion_id: int):
     observaciones = form_data.get("observaciones", "")
     recomendaciones = form_data.get("recomendaciones", "")
 
-    # 29 indicadores * 3 pts = 87 pts maximo = 100%
+    # 29 indicadores * 3 pts max = 87 pts = 100%
     nota_final = round((puntaje_total * 100.0) / 87.0, 2)
 
     conn = get_db()
@@ -398,9 +397,9 @@ async def guardar_evaluacion(request: Request, asignacion_id: int):
         eval_id = cursor.lastrowid
     except Exception as e:
         conn.rollback()
-        return HTMLResponse(f"<h3>Error al guardar evaluación: {str(e)}</h3>", status_code=400)
+        return HTMLResponse(f"<h3>Error al guardar evaluacion: {str(e)}</h3>", status_code=400)
     finally:
-        juez_row = conn.execute("SELECT juez_id FROM asignaciones WHERE id = ?", (asignacion_id,))[cite: 1].fetchone()
+        juez_row = conn.execute("SELECT juez_id FROM asignaciones WHERE id = ?", (asignacion_id,)).fetchone()
         juez_id = juez_row[0] if juez_row else 1
         conn.close()
 
@@ -432,11 +431,11 @@ def generar_documento_oficial_word(eval_id: int):
     conn.close()
 
     if not data:
-        return HTMLResponse("Evaluación no encontrada", status_code=404)
+        return HTMLResponse("Evaluacion no encontrada", status_code=404)
 
     plantilla_path = os.path.join("plantillas", "Plantilla Steam.docx")
     if not os.path.exists(plantilla_path):
-        return HTMLResponse("No se encontró 'Plantilla Steam.docx' dentro de la carpeta 'plantillas/'", status_code=500)
+        return HTMLResponse("No se encontro 'Plantilla Steam.docx' dentro de la carpeta 'plantillas/'", status_code=500)
 
     doc = docx.Document(plantilla_path)
 

@@ -171,7 +171,7 @@ def vista_ganadores(admin_session: str = Cookie(default=None)):
         })
     conn.close()
 
-    # Ordenar por mayor promedio descendente
+    # Ordenar proyectos de mayor a menor promedio
     ranking.sort(key=lambda x: x["promedio"], reverse=True)
 
     template = templates_env.get_template("ganadores.html")
@@ -193,15 +193,11 @@ def guardar_configuracion(nombre_institucion: str = Form(...), admin_session: st
     return RedirectResponse(url=f"/?msg={msg}", status_code=303)
 
 
-# ----------------- 4. REINICIAR BASE DE DATOS A CERO -----------------
+# ----------------- 4. REINICIAR BASE DE DATOS A CERO CON 1 CLIC -----------------
 @app.post("/admin/reset-total")
-def reset_base_datos(confirmacion: str = Form(...), admin_session: str = Cookie(default=None)):
+def reset_base_datos(admin_session: str = Cookie(default=None)):
     if not es_admin_autenticado(admin_session):
         return RedirectResponse(url="/login", status_code=303)
-
-    if confirmacion.strip().upper() != "BORRAR TODO":
-        err = urllib.parse.quote("Debe escribir exactamente 'BORRAR TODO' para confirmar.")
-        return RedirectResponse(url=f"/?error={err}", status_code=303)
 
     conn = get_db()
     cursor = conn.cursor()
@@ -474,7 +470,7 @@ async def guardar_evaluacion(request: Request, asignacion_id: int):
     observaciones = form_data.get("observaciones", "")
     recomendaciones = form_data.get("recomendaciones", "")
 
-    # 3) CÁLCULO MATEMÁTICO EXACTO: 37 indicadores * 3 pts = 111 pts máx = 100%
+    # 3) CÁLCULO MATEMÁTICO: 37 indicadores * 3 pts máx = 111 pts máx = 100%
     nota_final = round((puntaje_total * 100.0) / 111.0, 2)
 
     conn = get_db()

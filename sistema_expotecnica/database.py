@@ -13,7 +13,19 @@ def init_db():
     conn = get_db()
     cursor = conn.cursor()
 
-    # 1. Proyectos
+    # 1. Configuración Institucional
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS configuracion (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        nombre_institucion TEXT NOT NULL DEFAULT 'Colegio Técnico Profesional'
+    )
+    ''')
+    cursor.execute('''
+    INSERT OR IGNORE INTO configuracion (id, nombre_institucion) 
+    VALUES (1, 'Colegio Técnico Profesional')
+    ''')
+
+    # 2. Proyectos
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS proyectos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +40,7 @@ def init_db():
     )
     ''')
 
-    # 2. Jueces
+    # 3. Jueces
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS jueces (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +52,7 @@ def init_db():
     )
     ''')
 
-    # 3. Asignaciones (Un juez puede estar asignado a varios proyectos)
+    # 4. Asignaciones
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS asignaciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +65,7 @@ def init_db():
     )
     ''')
 
-    # 4. Evaluaciones oficiales STEAM (29 indicadores)
+    # 5. Evaluaciones Oficiales STEAM (37 indicadores = 111 pts)
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS evaluaciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

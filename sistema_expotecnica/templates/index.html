@@ -1,18 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="space-y-6">
+
+    <!-- Mensajes de Notificación -->
+    {% if msg %}
+    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg text-xs font-bold text-green-800 flex justify-between items-center">
+        <div><i class="fa-solid fa-circle-check mr-2"></i> {{ msg }}</div>
+        <a href="/" class="underline">Cerrar</a>
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg text-xs font-bold text-red-800 flex justify-between items-center">
+        <div><i class="fa-solid fa-triangle-exclamation mr-2"></i> {{ error }}</div>
+        <a href="/" class="underline">Cerrar</a>
+    </div>
+    {% endif %}
+
+    <!-- Encabezado Principal -->
     <div class="bg-indigo-900 text-white p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-lg">
         <div>
-            <h1 class="text-2xl font-bold">Panel de Administración General</h1>
-            <p class="text-sm text-indigo-200 mt-1">Control de proyectos, seguimiento de ternas y actas consolidadas.</p>
+            <h1 class="text-2xl font-bold">{{ nombre_institucion }}</h1>
+            <p class="text-sm text-indigo-200 mt-1">Panel General ExpoTécnica — Desafío STEAM</p>
         </div>
-        <div class="flex gap-2">
-            <a href="/admin/proyectos" class="bg-yellow-400 text-slate-900 text-xs font-bold px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition">+ Proyecto</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="/admin/ganadores" class="bg-yellow-400 text-slate-900 text-xs font-bold px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition flex items-center">
+                <i class="fa-solid fa-trophy mr-1.5"></i> Ver Ganadores
+            </a>
+            <a href="/admin/proyectos" class="bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-600 transition">+ Proyecto</a>
             <a href="/admin/jueces" class="bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-600 transition">+ Juez</a>
         </div>
     </div>
 
-    <!-- Directorio Rápido de QR para Jueces -->
+    <!-- 2. Configuración del Nombre de la Institución -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="font-bold text-slate-800 mb-2 text-sm flex items-center">
+            <i class="fa-solid fa-school text-indigo-600 mr-2"></i> Nombre de la Institución Educativa
+        </h2>
+        <form action="/admin/configuracion/guardar" method="POST" class="flex flex-col sm:flex-row gap-2">
+            <input type="text" name="nombre_institucion" value="{{ nombre_institucion }}" required placeholder="Ej. Colegio Técnico Profesional de San Carlos" class="flex-grow px-3 py-2 border rounded-lg text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-lg transition whitespace-nowrap">
+                Guardar Nombre Institucional
+            </button>
+        </form>
+    </div>
+
+    <!-- Directorio de Códigos QR -->
     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <h2 class="font-bold text-slate-900 mb-1 text-base flex items-center">
             <i class="fa-solid fa-qrcode text-indigo-600 mr-2"></i> Códigos QR de Acceso para Jueces
@@ -54,7 +86,7 @@
                         <th class="p-3">Categoría</th>
                         <th class="p-3">Estudiantes (3)</th>
                         <th class="p-3 text-center">Jueces</th>
-                        <th class="p-3 text-center">Promedio</th>
+                        <th class="p-3 text-center">Promedio (111 pts)</th>
                         <th class="p-3 text-right">Acta Oficial</th>
                     </tr>
                 </thead>
@@ -85,5 +117,22 @@
             </table>
         </div>
     </div>
+
+    <!-- 4. Zona de Peligro: Reiniciar Base de Datos desde Cero -->
+    <div class="bg-red-50 border border-red-200 p-5 rounded-2xl">
+        <h3 class="font-bold text-red-800 text-sm flex items-center mb-1">
+            <i class="fa-solid fa-triangle-exclamation mr-2"></i> Zona de Mantenimiento: Vaciar Sistema desde Cero
+        </h3>
+        <p class="text-xs text-red-600 mb-3">
+            Esta acción eliminará todos los proyectos, todos los jueces y todas las evaluaciones guardadas para iniciar un evento completamente nuevo.
+        </p>
+        <form action="/admin/reset-total" method="POST" class="flex flex-col sm:flex-row gap-2" onsubmit="return confirm('¿Está completamente seguro de que desea BORRAR TODO el sistema?');">
+            <input type="text" name="confirmacion" required placeholder="Escriba exactamente: BORRAR TODO" class="px-3 py-1.5 border border-red-300 rounded-lg text-xs outline-none uppercase font-bold bg-white text-red-900">
+            <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold text-xs px-4 py-1.5 rounded-lg transition">
+                <i class="fa-solid fa-trash-can mr-1"></i> Restablecer Base de Datos a 0
+            </button>
+        </form>
+    </div>
+
 </div>
 {% endblock %}

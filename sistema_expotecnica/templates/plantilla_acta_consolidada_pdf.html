@@ -4,112 +4,42 @@
     <meta charset="UTF-8">
     <title>Acta Consolidada - {{ proyecto.codigo }}</title>
     <style>
-        @page {
-            size: letter portrait;
-            margin: 15mm;
-        }
-        * {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 8.5pt;
-            color: #000;
-            line-height: 1.25;
-            margin: 0;
-            padding: 0;
-            background: #fff;
-        }
-        .no-print {
-            background: #1e293b;
-            color: #fff;
-            padding: 10px 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        .btn-print {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 8px 18px;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        @media print {
-            .no-print { display: none !important; }
-            body { margin: 0; }
-        }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            padding-bottom: 5px;
-            margin-bottom: 12px;
-        }
+        @page { size: letter portrait; margin: 15mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 8.5pt; color: #000; line-height: 1.25; margin: 0; padding: 0; background: #fff; }
+        .no-print { background: #1e293b; color: #fff; padding: 10px 20px; text-align: center; margin-bottom: 20px; border-radius: 8px; }
+        .btn-print { background: #2563eb; color: #fff; border: none; padding: 8px 18px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        @media print { .no-print { display: none !important; } body { margin: 0; } }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 12px; }
         .header h2 { margin: 0; font-size: 11pt; text-transform: uppercase; }
         .header h3 { margin: 2px 0 0 0; font-size: 9.5pt; }
         .header h4 { margin: 2px 0 0 0; font-size: 9pt; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 5px 6px;
-        }
-        th {
-            background-color: #f2f2f2 !important;
-            font-weight: bold;
-            text-align: center;
-        }
-        .label {
-            background-color: #f8fafc !important;
-            font-weight: bold;
-            width: 25%;
-        }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        th, td { border: 1px solid #000; padding: 5px 6px; }
+        th { background-color: #f2f2f2 !important; font-weight: bold; text-align: center; }
+        .label { background-color: #f8fafc !important; font-weight: bold; width: 25%; }
         .center { text-align: center; }
         .bold { font-weight: bold; }
-
-        .signatures-table {
-            margin-top: 35px;
-            border: none;
-        }
-        .signatures-table td {
-            border: none;
-            text-align: center;
-            vertical-align: bottom;
-            padding: 0 10px;
-        }
-        .line {
-            border-top: 1px solid #000;
-            padding-top: 4px;
-            font-size: 7.5pt;
-        }
+        .signatures-table { margin-top: 35px; border: none; }
+        .signatures-table td { border: none; text-align: center; vertical-align: bottom; padding: 0 10px; }
+        .line { border-top: 1px solid #000; padding-top: 4px; font-size: 7.5pt; }
     </style>
 </head>
 <body>
 
-    <!-- Botón de Control Superior -->
     <div class="no-print">
         <button class="btn-print" onclick="window.print()">
             🖨️ IMPRIMIR / GUARDAR ACTA EN PDF
         </button>
-        <span style="margin-left: 15px; font-size: 12px; color: #cbd5e1;">(Puede imprimir con 1, 2 o las 3 evaluaciones listas)</span>
+        <span style="margin-left: 15px; font-size: 12px; color: #cbd5e1;">(Cálculo oficial sobre 111 puntos máximos)</span>
     </div>
 
     <div class="header">
         <h2>MINISTERIO DE EDUCACIÓN PÚBLICA</h2>
-        <h3>DIRECCIÓN DE EDUCACIÓN TÉCNICA Y CAPACIDADES EMPRENDEDORAS</h3>
+        <h3>{{ nombre_institucion }}</h3>
         <h4>ACTA CONSOLIDADA DE EVALUACIÓN — EXPOTÉCNICA (DESAFÍO STEAM)</h4>
     </div>
 
-    <!-- Información del Proyecto -->
     <table>
         <tr>
             <td class="label">Código de Proyecto:</td>
@@ -127,7 +57,6 @@
         </tr>
     </table>
 
-    <!-- Tabla de Calificaciones de los Jueces -->
     <table>
         <thead>
             <tr>
@@ -143,7 +72,7 @@
                 <td class="center font-mono">{{ ev.juez_cedula }}</td>
                 <td class="center bold">
                     {% if ev.nota_final is not none %}
-                        {{ ev.nota_final }}% <span style="font-size: 7.5pt; color: #475569; font-weight: normal;">({{ ev.puntaje_total }} / 87 pts)</span>
+                        {{ ev.nota_final }}% <span style="font-size: 7.5pt; color: #475569; font-weight: normal;">({{ ev.puntaje_total }} / 111 pts)</span>
                     {% else %}
                         <span style="color: #b45309; font-weight: normal;">• Pendiente de evaluar</span>
                     {% endif %}
@@ -159,7 +88,6 @@
         </tbody>
     </table>
 
-    <!-- Firmas de los Jueces -->
     <table class="signatures-table">
         <tr>
             {% for ev in evaluaciones %}
@@ -175,7 +103,6 @@
         </tr>
     </table>
 
-    <!-- Sello Institucional -->
     <table class="signatures-table" style="margin-top: 25px;">
         <tr>
             <td style="width: 50%;">

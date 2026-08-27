@@ -14,13 +14,20 @@ app = FastAPI(title="Sistema ExpoTecnica MEP")
 
 templates_env = Environment(loader=FileSystemLoader("templates"))
 
-# Clave de acceso del Administrador
+# Clave de Administrador
 ADMIN_PASSWORD = "admin123"
 
 
 @app.on_event("startup")
 def startup_event():
     init_db()
+
+
+def obtener_institucion():
+    conn = get_db()
+    conf = conn.execute("SELECT nombre_institucion FROM configuracion WHERE id = 1").fetchone()
+    conn.close()
+    return conf["nombre_institucion"] if conf else "Colegio Técnico Profesional"
 
 
 def obtener_url_base(request: Request) -> str:
@@ -68,7 +75,7 @@ def procesar_login(password: str = Form(...)):
         response.set_cookie(key="admin_session", value="sesion_activa_admin", httponly=True)
         return response
     else:
-        err = urllib.parse.quote("Contrasena de administrador incorrecta.")
+        err = urllib.parse.quote("Contraseña de administrador incorrecta.")
         return RedirectResponse(url=f"/login?error={err}", status_code=303)
 
 
@@ -79,9 +86,9 @@ def procesar_logout():
     return response
 
 
-# ----------------- PANEL ADMINISTRADOR (PROTEGIDO) -----------------
+# ----------------- PANEL GENERAL (ADMIN) -----------------
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request, admin_session: str = Cookie(default=None)):
+def index(request: Request, msg: str = None, error: str = None, admin_session: str = Cookie(default=None)):
     if not es_admin_autenticado(admin_session):
         return RedirectResponse(url="/login", status_code=303)
 
@@ -110,16 +117,106 @@ def index(request: Request, admin_session: str = Cookie(default=None)):
             "especialidad": p["especialidad"],
             "estudiantes": [p["estudiante_1"], p["estudiante_2"], p["estudiante_3"]],
             "total_evaluados": total_evaluados,
-            "promedio": round(promedio, 2) if promedio else "Sin notas"
+            "promedio": round(promedio, 2) if promedio is not None else "Sin notas"
         })
     conn.close()
 
+    nombre_institucion = obtener_institucion()
     base_url = obtener_url_base(request)
     template = templates_env.get_template("index.html")
-    return template.render(proyectos=proyectos_summary, jueces=jueces, base_url=base_url)
+    return template.render(
+        proyectos=proyectos_summary,
+        jueces=jueces,
+        base_url=base_url,
+        nombre_institucion=nombre_institucion,
+        msg=msg,
+        error=error
+    )
 
 
-# ----------------- GENERADOR QR PERSONAL DEL JUEZ -----------------
+# ----------------- 1. GANADORES Y RANKING (EXCLUSIVO ADMIN) -----------------
+@app.get("/admin/ganadores", response_class=HTMLResponse)
+def vista_ganadores(admin_session: str = Cookie(default=None)):
+    if not es_admin_autenticado(admin_session):
+        return RedirectResponse(url="/login", status_code=303)
+
+    conn = get_db()
+    proyectos = conn.execute("SELECT * FROM proyectos").fetchall()
+
+    ranking = []
+    for p in proyectos:
+        asigs = conn.execute('''
+            SELECT a.estado, e.nota_final 
+            FROM asignaciones a
+            LEFT JOIN evaluaciones e ON e.asignacion_id = a.id
+            WHERE a.proyecto_id = ?
+        ''', (p['id'],)).fetchall()
+
+        evaluadas = [a['nota_final'] for a in asigs if a['nota_final'] is not None]
+        total_evaluadas = len(evaluadas)
+        promedio = round(sum(evaluadas) / total_evaluadas, 2) if total_evaluadas > 0 else 0.0
+
+        estudiantes = [p['estudiante_1']]
+        if p['estudiante_2']: estudiantes.append(p['estudiante_2'])
+        if p['estudiante_3']: estudiantes.append(p['estudiante_3'])
+
+        ranking.append({
+            "id": p["id"],
+            "codigo": p["codigo"],
+            "nombre": p["nombre"],
+            "estudiantes": estudiantes,
+            "total_evaluadas": total_evaluadas,
+            "promedio": promedio,
+            "completado": (total_evaluadas == 3)
+        })
+    conn.close()
+
+    # Ordenar por mayor promedio descendente
+    ranking.sort(key=lambda x: x["promedio"], reverse=True)
+
+    template = templates_env.get_template("ganadores.html")
+    return template.render(ranking=ranking, nombre_institucion=obtener_institucion())
+
+
+# ----------------- 2. CONFIGURACIÓN DE INSTITUCIÓN -----------------
+@app.post("/admin/configuracion/guardar")
+def guardar_configuracion(nombre_institucion: str = Form(...), admin_session: str = Cookie(default=None)):
+    if not es_admin_autenticado(admin_session):
+        return RedirectResponse(url="/login", status_code=303)
+
+    conn = get_db()
+    conn.execute("UPDATE configuracion SET nombre_institucion = ? WHERE id = 1", (nombre_institucion.strip(),))
+    conn.commit()
+    conn.close()
+
+    msg = urllib.parse.quote("Nombre de la institución actualizado correctamente.")
+    return RedirectResponse(url=f"/?msg={msg}", status_code=303)
+
+
+# ----------------- 4. REINICIAR BASE DE DATOS A CERO -----------------
+@app.post("/admin/reset-total")
+def reset_base_datos(confirmacion: str = Form(...), admin_session: str = Cookie(default=None)):
+    if not es_admin_autenticado(admin_session):
+        return RedirectResponse(url="/login", status_code=303)
+
+    if confirmacion.strip().upper() != "BORRAR TODO":
+        err = urllib.parse.quote("Debe escribir exactamente 'BORRAR TODO' para confirmar.")
+        return RedirectResponse(url=f"/?error={err}", status_code=303)
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM evaluaciones")
+    cursor.execute("DELETE FROM asignaciones")
+    cursor.execute("DELETE FROM proyectos")
+    cursor.execute("DELETE FROM jueces")
+    conn.commit()
+    conn.close()
+
+    msg = urllib.parse.quote("Se ha restablecido la base de datos a cero exitosamente.")
+    return RedirectResponse(url=f"/?msg={msg}", status_code=303)
+
+
+# ----------------- GENERADOR QR -----------------
 @app.get("/qr/juez/{juez_id}.png")
 def generar_qr_juez(request: Request, juez_id: int):
     base_url = obtener_url_base(request)
@@ -200,7 +297,7 @@ def crear_proyecto(
         conn.commit()
     except sqlite3.IntegrityError:
         conn.rollback()
-        err = urllib.parse.quote(f"El codigo de proyecto '{codigo}' ya existe.")
+        err = urllib.parse.quote(f"El código de proyecto '{codigo}' ya existe.")
         return RedirectResponse(url=f"/admin/proyectos?error={err}", status_code=303)
     finally:
         conn.close()
@@ -286,7 +383,7 @@ def crear_juez(
         conn.commit()
     except sqlite3.IntegrityError:
         conn.rollback()
-        err = urllib.parse.quote(f"Ya existe un juez registrado con la cedula '{cedula}'.")
+        err = urllib.parse.quote(f"Ya existe un juez registrado con la cédula '{cedula}'.")
         return RedirectResponse(url=f"/admin/jueces?error={err}", status_code=303)
     finally:
         conn.close()
@@ -307,7 +404,7 @@ def eliminar_juez(juez_id: int = Form(...), admin_session: str = Cookie(default=
     return RedirectResponse(url="/admin/jueces", status_code=303)
 
 
-# ----------------- PORTAL Y EVALUACION DEL JUEZ (ACCESO PUBLICO POR QR) -----------------
+# ----------------- PORTAL Y EVALUACIÓN DEL JUEZ -----------------
 @app.get("/juez/panel", response_class=HTMLResponse)
 def juez_panel(juez_id: int):
     conn = get_db()
@@ -349,7 +446,7 @@ def formulario_evaluar(asignacion_id: int):
     conn.close()
 
     if not asig:
-        return HTMLResponse("<h2>Asignacion no encontrada.</h2>", status_code=404)
+        return HTMLResponse("<h2>Asignación no encontrada.</h2>", status_code=404)
 
     template = templates_env.get_template("formulario_evaluacion.html")
     return template.render(asig=asig)
@@ -377,8 +474,8 @@ async def guardar_evaluacion(request: Request, asignacion_id: int):
     observaciones = form_data.get("observaciones", "")
     recomendaciones = form_data.get("recomendaciones", "")
 
-    # 29 indicadores * 3 pts max = 87 pts = 100%
-    nota_final = round((puntaje_total * 100.0) / 87.0, 2)
+    # 3) CÁLCULO MATEMÁTICO EXACTO: 37 indicadores * 3 pts = 111 pts máx = 100%
+    nota_final = round((puntaje_total * 100.0) / 111.0, 2)
 
     conn = get_db()
     cursor = conn.cursor()
@@ -397,7 +494,7 @@ async def guardar_evaluacion(request: Request, asignacion_id: int):
         eval_id = cursor.lastrowid
     except Exception as e:
         conn.rollback()
-        return HTMLResponse(f"<h3>Error al guardar evaluacion: {str(e)}</h3>", status_code=400)
+        return HTMLResponse(f"<h3>Error al guardar evaluación: {str(e)}</h3>", status_code=400)
     finally:
         juez_row = conn.execute("SELECT juez_id FROM asignaciones WHERE id = ?", (asignacion_id,)).fetchone()
         juez_id = juez_row[0] if juez_row else 1
@@ -431,11 +528,11 @@ def generar_documento_oficial_word(eval_id: int):
     conn.close()
 
     if not data:
-        return HTMLResponse("Evaluacion no encontrada", status_code=404)
+        return HTMLResponse("Evaluación no encontrada", status_code=404)
 
     plantilla_path = os.path.join("plantillas", "Plantilla Steam.docx")
     if not os.path.exists(plantilla_path):
-        return HTMLResponse("No se encontro 'Plantilla Steam.docx' dentro de la carpeta 'plantillas/'", status_code=500)
+        return HTMLResponse("No se encontró 'Plantilla Steam.docx' dentro de la carpeta 'plantillas/'", status_code=500)
 
     doc = docx.Document(plantilla_path)
 
@@ -450,7 +547,7 @@ def generar_documento_oficial_word(eval_id: int):
               data["v_a_car"] + data["v_b_car"])
 
     reemplazos = {
-        "<<Colegio>>": "Colegio Tecnico Profesional",
+        "<<Colegio>>": obtener_institucion(),
         "<<Estudiante 1>>": data["estudiante_1"] or "",
         "<<Estudiante 2>>": data["estudiante_2"] or "",
         "<<Estudiante 3>>": data["estudiante_3"] or "",
@@ -505,12 +602,13 @@ def generar_documento_oficial_word(eval_id: int):
         "<<Indicador V.b (CP)>>": data["v_b_car"],
         "<<Suma V>>": suma_v,
 
-        "<<<Sumatoria>>": f"{data['puntaje_total']} / 87",
-        "<<Sumatoria>>": f"{data['puntaje_total']} / 87",
+        # 3) Sumatoria y Porcentaje sobre 111 puntos
+        "<<<Sumatoria>>": f"{data['puntaje_total']} / 111",
+        "<<Sumatoria>>": f"{data['puntaje_total']} / 111",
         "<<Calificacion>>": data["nota_final"],
         "<<Porcentaje>>": f"{data['nota_final']}%",
         "<<Recomendaciones>>": data["recomendaciones"] or "Sin recomendaciones adicionales.",
-        "<<Juez>>": f"{data['juez_nombre']} (Cedula: {data['juez_cedula']})",
+        "<<Juez>>": f"{data['juez_nombre']} (Cédula: {data['juez_cedula']})",
         "<<Marca temporal>>": str(data["fecha"])
     }
 
@@ -558,5 +656,6 @@ def vista_acta_consolidada(proyecto_id: int):
         proyecto=proyecto,
         estudiantes=estudiantes,
         evaluaciones=evaluaciones,
-        promedio_general=promedio_general
+        promedio_general=promedio_general,
+        nombre_institucion=obtener_institucion()
     )
